@@ -25,6 +25,10 @@ public class PantallaPrincipal extends AppCompatActivity {
     Button btnLogOut;
     private static final String TAG = "Resposta server :";
 
+    /**
+     * Método que recoge los valores del usuario
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +51,9 @@ public class PantallaPrincipal extends AppCompatActivity {
 
         btnLogOut = (Button) findViewById(R.id.btn_logout);
 
+        /**
+        * Método de Logout
+        */
         btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,6 +62,9 @@ public class PantallaPrincipal extends AppCompatActivity {
         });
     }
 
+    /**
+     * Método que ejecuta la acción de Logout
+     */
     class Task2 extends AsyncTask<String,Void, String> {
 
         @Override
@@ -66,24 +76,24 @@ public class PantallaPrincipal extends AppCompatActivity {
         protected String doInBackground(String... strings) {
 
             try {
-
+                //Intentamos establecer conexión con el servidor
                 Socket sc;
                 sc = new Socket("192.168.0.15", 5000);
                 DataInputStream in = new DataInputStream(sc.getInputStream());
                 DataOutputStream out = new DataOutputStream(sc.getOutputStream());
 
-                // Llegir la resposta del servidor al establir la connexió
+                //Variable que recibirá la respuesta del servidor una vez establecida la conexión
                 String resposta_svr = in.readUTF();
                 Log.i(TAG,resposta_svr);
                 Log.i(TAG, String.valueOf(String.valueOf(tvUsuari.getText().toString())) );
                 Log.i(TAG, String.valueOf(String.valueOf( tvPwd.getText().toString())) );
 
-                //Enviem resposta al servidor amb el usuari i la contrasenya i 0
+                //Enviamos respuesta al servidor con el usuario, contraseña y valor 0
                 out.writeUTF("LOGIN,"+ String.valueOf(tvUsuari.getText().toString()) + ","
                         + String.valueOf(tvPwd.getText().toString()) + ","
                         + String.valueOf(tvId.getText().toString()));
 
-                //Executem la consulta de la crida per sortir
+                //Ejecutamos la consulta de USER_EXIT
                 out.writeUTF("USER_EXIT");
 
             } catch (IOException  e) {
@@ -91,6 +101,12 @@ public class PantallaPrincipal extends AppCompatActivity {
             }
             return strings[0];
         }
+
+        /**
+         * Método que retorna a la pantalla del login
+         * @param s del método doInBackground
+         */
+
         @Override
         protected void onPostExecute(String s){
 
