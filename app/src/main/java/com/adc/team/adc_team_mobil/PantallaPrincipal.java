@@ -89,10 +89,8 @@ public class PantallaPrincipal extends AppCompatActivity {
             } catch (IOException  e) {
                 e.printStackTrace();
             }
-
             return strings[0];
         }
-
         @Override
         protected void onPostExecute(String s){
 
