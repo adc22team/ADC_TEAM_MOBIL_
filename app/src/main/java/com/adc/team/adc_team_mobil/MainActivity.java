@@ -125,7 +125,33 @@ public class MainActivity extends AppCompatActivity {
                     resposta_rol = in.readInt();
                     Log.i(TAG, String.valueOf(resposta_rol));
                     if(resposta_rol!=3){
-                        out.writeUTF("USER_EXIT");
+                        Log.i(TAG,"Usario con rol inválido");
+                        //out.writeUTF("USER_EXIT");
+                        try {
+
+                            Socket socket;
+                            socket = new Socket("192.168.0.15", 5000);
+                            DataInputStream inp = new DataInputStream(sc.getInputStream());
+                            DataOutputStream outp = new DataOutputStream(sc.getOutputStream());
+
+                            // Llegir la resposta del servidor al establir la connexió
+                            String resposta_sevr = inp.readUTF();
+                            Log.i(TAG,resposta_sevr);
+                            Log.i(TAG, String.valueOf(String.valueOf(etUsuario.getText().toString())) );
+                            Log.i(TAG, String.valueOf(String.valueOf( etClave.getText().toString())) );
+
+                            //Enviem resposta al servidor amb el usuari i la contrasenya i 0
+                            outp.writeUTF("LOGIN,"+ String.valueOf(etUsuario.getText().toString()) + ","
+                                    + String.valueOf(etClave.getText().toString()) + ","
+                                    + resposta_id);
+
+                            //Executem la consulta de la crida per sortir
+                            outp.writeUTF("USER_EXIT");
+
+                        } catch (IOException  e) {
+                            e.printStackTrace();
+
+                        }
                     }else{
                         Log.i(TAG,"Bienvenido");
                     }
@@ -137,10 +163,6 @@ public class MainActivity extends AppCompatActivity {
             return strings[0];
         }
 
-        /**
-         * Método que ejecuta la acción de la pantalla principal
-         * @param s
-         */
         @Override
         protected void onPostExecute(String s) {
 
@@ -148,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             btnIniciarSesion.setEnabled(true);
 
             Log.i(TAG, "Valor de resposta_id:"+String.valueOf(resposta_id));
-            //Si el usuario tiene valor de Id de conexión, accede a la pantalla de Inicio
+
             if (resposta_id != 0) {
                 Log.i(TAG, String.valueOf(resposta_rol));
 
@@ -160,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("id", String.valueOf(resposta_id));
                 intent.putExtra("rol", String.valueOf(resposta_rol));
                 startActivity(intent);
+            }
         }
     }
-  }
 }
