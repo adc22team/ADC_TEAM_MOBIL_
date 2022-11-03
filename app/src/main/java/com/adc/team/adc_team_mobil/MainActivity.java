@@ -16,7 +16,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 /**
  * Clase que representa la pantalla del Login de usuario movil
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     int resposta_id;
     int resposta_rol;
+    boolean usarioValido;
     private static final String TAG = "Resposta server :";
 
     /**
@@ -55,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
          * Acción del botón Login para recoger el nombre del usuario
          */
         btnIniciarSesion.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                new Task1().execute(etUsuario.getText().toString());
+
+                validaUsuario(etUsuario.getText().toString(), etClave.getText().toString());
+                if (usarioValido){
+                new Task1().execute(etUsuario.getText().toString());}
             }
         });
     }
@@ -75,15 +79,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             progressBar.setVisibility(View.VISIBLE);
             btnIniciarSesion.setEnabled(false);
-
         }
-        public boolean validarCampos (String etUsuario, String etClave){
-            if(etUsuario.isEmpty() || etClave.isEmpty()){
-                //Toast.makeText(this,"Por favor ingrese usuario y contraseña ", Toast.LENGTH_LONG).show();
 
-            }
-            return false;
-        }
 
         /**
          * Método Override doInBackGround
@@ -108,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
 
                 // Se recibe la respuesta del server SERVER_SHOW_ELHO_established connection y se la muestra en logcat
                 Log.i(TAG, resposta_svr);
+
+
+
+
                 //Muestra la cadena del Usuario
                 Log.i(TAG, String.valueOf(String.valueOf(etUsuario.getText().toString())));
                 //Muestra la cadena del password
@@ -116,46 +117,29 @@ public class MainActivity extends AppCompatActivity {
                 //Enviamos respuesta al servidor con el usuario, contraseña y valor 0
                 out.writeUTF("LOGIN," + String.valueOf(etUsuario.getText().toString()) + "," + String.valueOf(etClave.getText().toString()) + "," + "0");
 
+
+
+
+
+
+
                 //Variable a la que se le asigna el valor entero del id de conexión del usuario y que recibimos del Servidor al establecer conexión
                 resposta_id = in.readInt();
                 //Método Log que muestra el valor de la respuesta
-                Log.i(TAG, String.valueOf(resposta_id));
+                Log.i(TAG, "el usuario tiene el id asignado: " + String.valueOf(resposta_id));
 
                 if(resposta_id !=0){
                     resposta_rol = in.readInt();
-                    Log.i(TAG, String.valueOf(resposta_rol));
-                    if(resposta_rol!=3){
-                        Log.i(TAG,"Usario con rol inválido");
-                        //out.writeUTF("USER_EXIT");
-                        try {
-
-                            Socket socket;
-                            socket = new Socket("192.168.0.15", 5000);
-                            DataInputStream inp = new DataInputStream(sc.getInputStream());
-                            DataOutputStream outp = new DataOutputStream(sc.getOutputStream());
-
-                            // Llegir la resposta del servidor al establir la connexió
-                            String resposta_sevr = inp.readUTF();
-                            Log.i(TAG,resposta_sevr);
-                            Log.i(TAG, String.valueOf(String.valueOf(etUsuario.getText().toString())) );
-                            Log.i(TAG, String.valueOf(String.valueOf( etClave.getText().toString())) );
-
-                            //Enviem resposta al servidor amb el usuari i la contrasenya i 0
-                            outp.writeUTF("LOGIN,"+ String.valueOf(etUsuario.getText().toString()) + ","
-                                    + String.valueOf(etClave.getText().toString()) + ","
-                                    + resposta_id);
-
-                            //Executem la consulta de la crida per sortir
-                            outp.writeUTF("USER_EXIT");
-
-                        } catch (IOException  e) {
-                            e.printStackTrace();
-
-                        }
-                    }else{
-                        Log.i(TAG,"Bienvenido");
-                    }
+                   Log.i(TAG, "El usuario tiene el rol: "+ String.valueOf(resposta_rol));
+                   // if(resposta_rol==1){
+                     //   validaRol(resposta_id);
+                   // }else if (resposta_rol==2){
+                   //     validaRol(resposta_id);
+                   // }else{
+                     //   Log.i(TAG,"Bienvenido");
+                    //}
                 }
+
             } catch (IOException  e) {
                 e.printStackTrace();
             }
@@ -184,5 +168,49 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
+
+
+        public void validaRol(int resposta_id){
+            int id=resposta_id;
+
+            try {
+                //Intentamos establecer conexión con el servidor
+                Socket sc;
+                sc = new Socket("192.168.0.15", 5000);
+                DataInputStream in = new DataInputStream(sc.getInputStream());
+                DataOutputStream out = new DataOutputStream(sc.getOutputStream());
+
+                //Variable que recibirá la respuesta del servidor una vez establecida la conexión
+                String resposta_svr = in.readUTF();
+                Log.i(TAG,resposta_svr);
+                Log.i(TAG, String.valueOf(String.valueOf(etUsuario.getText().toString())) );
+                Log.i(TAG, String.valueOf(String.valueOf( etClave.getText().toString())) );
+
+                //Enviamos respuesta al servidor con el usuario, contraseña y valor del id de conexion
+                out.writeUTF("LOGIN,"+ String.valueOf(etUsuario.getText().toString()) + ","
+                        + String.valueOf(etClave.getText().toString()) + ","
+                        + id);
+
+                //Ejecutamos la consulta de USER_EXIT
+                out.writeUTF("USER_EXIT");
+
+            } catch (IOException  e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    public boolean validaUsuario (String usuario, String clave){
+
+                if(usuario.isEmpty() || clave.isEmpty()){
+                    Toast.makeText(getApplicationContext(),"Por favor ingrese usuario y contraseña", Toast.LENGTH_LONG).show();
+                    usarioValido=false;
+                } else {
+                    usarioValido=true;
+            }
+
+             return   usarioValido;
     }
 }
