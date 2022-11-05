@@ -85,8 +85,8 @@ public class PantallaPrincipal extends AppCompatActivity {
                 //Variable que recibirá la respuesta del servidor una vez establecida la conexión
                 String resposta_svr = in.readUTF();
                 Log.i(TAG,resposta_svr);
-                Log.i(TAG, String.valueOf(String.valueOf(tvUsuari.getText().toString())) );
-                Log.i(TAG, String.valueOf(String.valueOf( tvPwd.getText().toString())) );
+                Log.i(TAG, "Se desconecta el usuario: "+String.valueOf(String.valueOf(tvUsuari.getText().toString())) );
+
 
                 //Enviamos respuesta al servidor con el usuario, contraseña y valor 0
                 out.writeUTF("LOGIN,"+ String.valueOf(tvUsuari.getText().toString()) + ","

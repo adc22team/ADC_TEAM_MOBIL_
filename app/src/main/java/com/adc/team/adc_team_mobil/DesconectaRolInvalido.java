@@ -40,7 +40,7 @@ public class DesconectaRolInvalido extends AppCompatActivity {
         String rol = getIntent().getStringExtra("rol");
 
         tvUsuari.setText(usuari);
-        //tvPwd.setText(pwd);
+        tvPwd.setText(pwd);
         tvId.setText(id);
         tvRol.setText(rol);
 
