@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Resposta server :";
 
     /**
-     *Inicia la actividad
+     * Inicia la actividad
+     *
      * @param savedInstanceState guarda el estado de la pantalla
      */
 
@@ -60,8 +61,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 validaUsuario(etUsuario.getText().toString(), etClave.getText().toString());
-                if (usarioValido){
-                new Task1().execute(etUsuario.getText().toString());}
+                if (usarioValido) {
+                    new Task1().execute(etUsuario.getText().toString());
+                }
             }
         });
     }
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
      * Desarrollo de la acción recoger el nombre del usuario
      * Extiende la clase AsyncTask que permite ejecutar tareas en segundo plano, a manera de hilos
      */
-    class Task1 extends AsyncTask<String,Void, String> {
+    class Task1 extends AsyncTask<String, Void, String> {
         /**
          * Métdodo Override onPreExecute()
          * Antes de comenzar el hilo, el botón de Login no es visible, osea no está activo
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Método Override doInBackGround
          * Al comenzar el hilo, ejecutamos la acción en segundo plano, iniciando la conexión
+         *
          * @param strings
          * @return
          */
@@ -106,9 +109,6 @@ public class MainActivity extends AppCompatActivity {
                 // Se recibe la respuesta del server SERVER_SHOW_ELHO_established connection y se la muestra en logcat
                 Log.i(TAG, resposta_svr);
 
-
-
-
                 //Muestra la cadena del Usuario
                 Log.i(TAG, String.valueOf(String.valueOf(etUsuario.getText().toString())));
                 //Muestra la cadena del password
@@ -118,29 +118,16 @@ public class MainActivity extends AppCompatActivity {
                 out.writeUTF("LOGIN," + String.valueOf(etUsuario.getText().toString()) + "," + String.valueOf(etClave.getText().toString()) + "," + "0");
 
 
-
-
-
-
-
                 //Variable a la que se le asigna el valor entero del id de conexión del usuario y que recibimos del Servidor al establecer conexión
                 resposta_id = in.readInt();
                 //Método Log que muestra el valor de la respuesta
-                Log.i(TAG, "el usuario tiene el id asignado: " + String.valueOf(resposta_id));
+                Log.i(TAG, "El usuario tiene el id asignado: " + String.valueOf(resposta_id));
 
-                if(resposta_id !=0){
+                if (resposta_id != 0) {
                     resposta_rol = in.readInt();
-                   Log.i(TAG, "El usuario tiene el rol: "+ String.valueOf(resposta_rol));
-                   // if(resposta_rol==1){
-                     //   validaRol(resposta_id);
-                   // }else if (resposta_rol==2){
-                   //     validaRol(resposta_id);
-                   // }else{
-                     //   Log.i(TAG,"Bienvenido");
-                    //}
                 }
 
-            } catch (IOException  e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -153,64 +140,50 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setVisibility(View.INVISIBLE);
             btnIniciarSesion.setEnabled(true);
 
-            Log.i(TAG, "Valor de resposta_id:"+String.valueOf(resposta_id));
+            //Log.i(TAG, "Valor de resposta_id (id asignado): "+String.valueOf(resposta_id));
 
             if (resposta_id != 0) {
-                Log.i(TAG, String.valueOf(resposta_rol));
+                Log.i(TAG, "El usuario tiene el rol: " + String.valueOf(resposta_rol));
 
-                Intent intent = new Intent(MainActivity.this, PantallaPrincipal.class);
-                Log.i(TAG, String.valueOf(resposta_id));
-                Log.i(TAG, String.valueOf(resposta_rol));
-                intent.putExtra("usuari", etUsuario.getText().toString());
-                intent.putExtra("pwd", etClave.getText().toString());
-                intent.putExtra("id", String.valueOf(resposta_id));
-                intent.putExtra("rol", String.valueOf(resposta_rol));
-                startActivity(intent);
-            }
-        }
+                if (resposta_rol == 3) {
 
+                    Intent intent = new Intent(MainActivity.this, PantallaPrincipal.class);
 
-        public void validaRol(int resposta_id){
-            int id=resposta_id;
-
-            try {
-                //Intentamos establecer conexión con el servidor
-                Socket sc;
-                sc = new Socket("192.168.0.15", 5000);
-                DataInputStream in = new DataInputStream(sc.getInputStream());
-                DataOutputStream out = new DataOutputStream(sc.getOutputStream());
-
-                //Variable que recibirá la respuesta del servidor una vez establecida la conexión
-                String resposta_svr = in.readUTF();
-                Log.i(TAG,resposta_svr);
-                Log.i(TAG, String.valueOf(String.valueOf(etUsuario.getText().toString())) );
-                Log.i(TAG, String.valueOf(String.valueOf( etClave.getText().toString())) );
-
-                //Enviamos respuesta al servidor con el usuario, contraseña y valor del id de conexion
-                out.writeUTF("LOGIN,"+ String.valueOf(etUsuario.getText().toString()) + ","
-                        + String.valueOf(etClave.getText().toString()) + ","
-                        + id);
-
-                //Ejecutamos la consulta de USER_EXIT
-                out.writeUTF("USER_EXIT");
-
-            } catch (IOException  e) {
-                e.printStackTrace();
-            }
-
-        }
-
-    }
-
-    public boolean validaUsuario (String usuario, String clave){
-
-                if(usuario.isEmpty() || clave.isEmpty()){
-                    Toast.makeText(getApplicationContext(),"Por favor ingrese usuario y contraseña", Toast.LENGTH_LONG).show();
-                    usarioValido=false;
+                    intent.putExtra("usuari", etUsuario.getText().toString());
+                    intent.putExtra("pwd", etClave.getText().toString());
+                    intent.putExtra("id", String.valueOf(resposta_id));
+                    intent.putExtra("rol", String.valueOf(resposta_rol));
+                    startActivity(intent);
                 } else {
-                    usarioValido=true;
+                    Toast.makeText(getApplicationContext(), "Rol invalido para la aplición móvil", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Ingrese desde la aplición de escritorio.", Toast.LENGTH_LONG).show();
+                    Intent intent2 =new Intent(MainActivity.this, DesconectaRolInvalido.class);
+                    intent2.putExtra("usuari", etUsuario.getText().toString());
+                    intent2.putExtra("id", String.valueOf(resposta_id));
+                    intent2.putExtra("rol", String.valueOf(resposta_rol));
+
+                    startActivity(intent2);
+
+                }
             }
 
-             return   usarioValido;
+        }
+
+
     }
-}
+
+    public boolean validaUsuario(String usuario, String clave) {
+
+        if (usuario.isEmpty() || clave.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Por favor ingrese usuario y contraseña", Toast.LENGTH_LONG).show();
+            usarioValido = false;
+        } else {
+            usarioValido = true;
+        }
+
+        return usarioValido;
+    }
+
+    }
+
+
