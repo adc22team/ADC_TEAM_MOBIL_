@@ -54,13 +54,16 @@ public class MainActivity extends AppCompatActivity {
 
         /**
          * Acción del botón Login para recoger el nombre del usuario
+         * En el caso de que no se ingrese ningun valor en campos usuario y/o contraseña
+         * se controla a través del método validaUsuario()
          */
         btnIniciarSesion.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-
+                //llamamiento al método validaUsuario con el valor recogido en campos usuario y contraseña
                 validaUsuario(etUsuario.getText().toString(), etClave.getText().toString());
+                //Luego de validar que el usario ha ingresado un usuario y su contraseña, ejecuta toda la acción para hacer un Login
                 if (usarioValido) {
                     new Task1().execute(etUsuario.getText().toString());
                 }
@@ -75,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     class Task1 extends AsyncTask<String, Void, String> {
         /**
          * Métdodo Override onPreExecute()
-         * Antes de comenzar el hilo, el botón de Login no es visible, osea no está activo
+         * Antes de comenzar el hilo, el botón de Login no es visible, osea no está activo en un primer momento
          */
         @Override
         protected void onPreExecute() {
@@ -123,7 +126,10 @@ public class MainActivity extends AppCompatActivity {
                 //Método Log que muestra el valor de la respuesta
                 Log.i(TAG, "El usuario tiene el id asignado: " + String.valueOf(resposta_id));
 
+                //si el server nos ha proporcionado un id válido, es decir un número diferente de cero, implica que
+                //se trata de un usario registrado en la base de datos
                 if (resposta_id != 0) {
+                    //entonces asignamos en la variable resposta_rol, el valor recogido por el server (rol 1, 2 ó 3)
                     resposta_rol = in.readInt();
                 }
 
@@ -134,19 +140,24 @@ public class MainActivity extends AppCompatActivity {
             return strings[0];
         }
 
+        /**
+         * Método que una vez realizada la conección, valida el rol y ejecuta diversas opciones dependiendo
+         * del caso.
+         * @param s
+         */
         @Override
         protected void onPostExecute(String s) {
 
             progressBar.setVisibility(View.INVISIBLE);
             btnIniciarSesion.setEnabled(true);
 
-            //Log.i(TAG, "Valor de resposta_id (id asignado): "+String.valueOf(resposta_id));
-
+             //si el server nos ha proporcionado un id válido, es decir un número diferente de cero, implica que
+            //se trata de un usario registrado en la base de datos
             if (resposta_id != 0) {
                 Log.i(TAG, "El usuario tiene el rol: " + String.valueOf(resposta_rol));
-
+                // si el rol es 3, eso es que un Usuario normal, puede acceder a la aplicación móvil
                 if (resposta_rol == 3) {
-
+                    //ejecutamos las acciones correspondientes para acceder a la pantalla Prinicipal
                     Intent intent = new Intent(MainActivity.this, PantallaPrincipal.class);
 
                     intent.putExtra("usuari", etUsuario.getText().toString());
@@ -155,8 +166,12 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("rol", String.valueOf(resposta_rol));
                     startActivity(intent);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Rol invalido para la aplición móvil", Toast.LENGTH_LONG).show();
-                    Toast.makeText(getApplicationContext(), "Ingrese desde la aplición de escritorio.", Toast.LENGTH_LONG).show();
+                    //Si el rol es distinto de 3, ejecutamos las acciones correspondientes:
+                    //mostramos dos mensajes de rol inválido y a su vez ejecutamos la actividad (clase DesconectaRolInvalido)
+                    //para forzar al usuario de rol incorrecto a abandonar el acceso a la aplicación, desconectándolo por completo.
+
+                    Toast.makeText(getApplicationContext(), "Rol invalido para la aplicación móvil", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Ingrese desde la aplicación de escritorio.", Toast.LENGTH_LONG).show();
                     Intent intent2 =new Intent(MainActivity.this, DesconectaRolInvalido.class);
                     intent2.putExtra("usuari", etUsuario.getText().toString());
                     intent2.putExtra("id", String.valueOf(resposta_id));
@@ -165,25 +180,31 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent2);
 
                 }
+            } else{
+                //Exista otra posibilidad y es que el usuario haya ingresado mal alguna de sus credenciales
+                //en este caso, se muestra un mensaje por pantalla de Credenciales incorrectas.
+                Toast.makeText(getApplicationContext(), "Credenciales incorrectas", Toast.LENGTH_LONG).show();
+                Log.i(TAG, "El usuario ha ingresado mal las credenciales: "+ "User:" + String.valueOf(String.valueOf(etUsuario.getText().toString())) + "  Pass: "+String.valueOf(String.valueOf(etClave.getText().toString())));
             }
-
         }
-
-
     }
 
+    /**
+     * Método que permite valorar en una primera instancia que el usuario ingrese usuario y contraseña, ambos valores
+     * @param usuario
+     * @param clave
+     * @return
+     */
     public boolean validaUsuario(String usuario, String clave) {
 
         if (usuario.isEmpty() || clave.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Por favor ingrese usuario y contraseña", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Ingrese usuario y contraseña.", Toast.LENGTH_LONG).show();
             usarioValido = false;
         } else {
             usarioValido = true;
         }
-
         return usarioValido;
     }
-
     }
 
 

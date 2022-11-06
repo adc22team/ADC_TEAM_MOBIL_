@@ -12,7 +12,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-
+/**
+ * Clase de soporte que Desconecta un usuario de rol #1 o #2 del servidor
+ *  @author Daniela Gutierrez
+ */
 public class DesconectaRolInvalido extends AppCompatActivity {
     //Declaración de variables
     private TextView tvResultado, tvUsuari, tvPwd, tvId, tvRol;
@@ -20,7 +23,8 @@ public class DesconectaRolInvalido extends AppCompatActivity {
     private static final String TAG = "Resposta server :";
 
     /**
-     * Método que recoge los valores del usuario
+     * Método que recoge los valores del usuario desde el MainActivity, es decir cuando se ha logueado
+     * y recoge los valores de acceso que le ha otorgado el server
      *
      * @param savedInstanceState
      */
@@ -47,7 +51,7 @@ public class DesconectaRolInvalido extends AppCompatActivity {
         new Task3().execute(tvUsuari.getText().toString());
     }
     /**
-     * Método que ejecuta la acción de Logout
+     * Método que ejecuta la acción de Desconexión
      */
     class Task3 extends AsyncTask<String,Void, String> {
 

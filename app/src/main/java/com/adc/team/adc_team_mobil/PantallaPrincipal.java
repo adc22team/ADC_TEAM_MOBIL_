@@ -17,6 +17,7 @@ import java.net.Socket;
 
 /**
  * Clase de la pantalla principal del login
+ *  @author Daniela Gutierrez
  */
 
 public class PantallaPrincipal extends AppCompatActivity {
@@ -45,18 +46,21 @@ public class PantallaPrincipal extends AppCompatActivity {
         String  rol    = getIntent().getStringExtra("rol");
 
         tvUsuari.setText(usuari);
-        tvPwd.setText(pwd);
+        tvPwd.setText(pwd); // Este valor está de modo oculto de tal manera de que no sea visible al entrar a la pantalla Principal
         tvId.setText(id);
         tvRol.setText(rol);
 
         btnLogOut = (Button) findViewById(R.id.btn_logout);
 
         /**
-        * Método de Logout
+        * Método del botón Logout que ejecuta la acción explicita en Task2, que es básicamente hacer el logout
+         * desde la aplicación móvil
         */
         btnLogOut.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
+                //lleva como parámetro el usuario en formato String, que se desconectará
                 new Task2().execute(tvUsuari.getText().toString());
             }
         });
@@ -104,6 +108,7 @@ public class PantallaPrincipal extends AppCompatActivity {
 
         /**
          * Método que retorna a la pantalla del login
+         * una vez ejecutada la acción del logout
          * @param s del método doInBackground
          */
 
