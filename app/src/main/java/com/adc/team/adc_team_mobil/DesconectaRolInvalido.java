@@ -21,6 +21,7 @@ public class DesconectaRolInvalido extends AppCompatActivity {
     private TextView tvResultado, tvUsuari, tvPwd, tvId, tvRol;
     Button btnLogOut;
     private static final String TAG = "Resposta server :";
+    private String id_conn;
 
     /**
      * Método que recoge los valores del usuario desde el MainActivity, es decir cuando se ha logueado
@@ -40,12 +41,12 @@ public class DesconectaRolInvalido extends AppCompatActivity {
 
         String usuari = getIntent().getStringExtra("usuari");
         String pwd = getIntent().getStringExtra("pwd");
-        String id = getIntent().getStringExtra("id");
+        id_conn = getIntent().getStringExtra("id");
         String rol = getIntent().getStringExtra("rol");
 
         tvUsuari.setText(usuari);
         tvPwd.setText(pwd);
-        tvId.setText(id);
+        tvId.setText(id_conn);
         tvRol.setText(rol);
 
         new Task3().execute(tvUsuari.getText().toString());
@@ -66,23 +67,23 @@ public class DesconectaRolInvalido extends AppCompatActivity {
             try {
                 //Intentamos establecer conexión con el servidor
                 Socket sc;
-                sc = new Socket("192.168.0.15", 5000);
+                sc = new Socket("192.168.0.19", 5000);
                 DataInputStream in = new DataInputStream(sc.getInputStream());
                 DataOutputStream out = new DataOutputStream(sc.getOutputStream());
 
                 //Variable que recibirá la respuesta del servidor una vez establecida la conexión
+               // String resposta_svr = in.readUTF();
+                // Enviament de la clau pública del servidor
+                out.writeUTF("Enviament de la clau pública del client");
+                // Llegim la clau pública del servidor
                 String resposta_svr = in.readUTF();
+
                 Log.i(TAG,resposta_svr);
                 Log.i(TAG, "Se desconecta el usuario de rol inválido: " + String.valueOf(String.valueOf(tvUsuari.getText().toString())) );
 
-
-                //Enviamos respuesta al servidor con el usuario, contraseña y valor de id asignado
-                out.writeUTF("LOGIN,"+ String.valueOf(tvUsuari.getText().toString()) + ","
-                        + String.valueOf(tvPwd.getText().toString()) + ","
-                        + String.valueOf(tvId.getText().toString()));
-
                 //Ejecutamos la consulta de USER_EXIT
-                out.writeUTF("USER_EXIT");
+                Log.i(TAG,"valor" + id_conn);
+                out.writeUTF(id_conn + ",USER_EXIT");
 
             } catch (IOException  e) {
                 e.printStackTrace();

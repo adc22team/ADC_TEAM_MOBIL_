@@ -100,16 +100,19 @@ public class MainActivity extends AppCompatActivity {
             try {
                 //Intentamos establecer conexión con el servidor
                 Socket sc;
-                sc = new Socket("192.168.0.15", 5000);
+                sc = new Socket("192.168.0.19", 5000);
                 DataInputStream in = new DataInputStream(sc.getInputStream());
                 DataOutputStream out = new DataOutputStream(sc.getOutputStream());
 
                 //Variable que recibirá la respuesta del servidor una vez establecida la conexión
+                // Enviament de la clau pública del servidor
+                out.writeUTF("Enviament de la clau pública del client");
+                // Llegim la clau pública del servidor
                 String resposta_svr = in.readUTF();
 
                 //Métodos Log que muestran información en el logcat
 
-                // Se recibe la respuesta del server SERVER_SHOW_ELHO_established connection y se la muestra en logcat
+                // Se recibe la cable pública del servidor
                 Log.i(TAG, resposta_svr);
 
                 //Muestra la cadena del Usuario
@@ -118,8 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, String.valueOf(String.valueOf(etClave.getText().toString())));
 
                 //Enviamos respuesta al servidor con el usuario, contraseña y valor 0
-                out.writeUTF("LOGIN," + String.valueOf(etUsuario.getText().toString()) + "," + String.valueOf(etClave.getText().toString()) + "," + "0");
-
+                out.writeUTF("0,LOGIN," +String.valueOf(etUsuario.getText().toString()) + "," + String.valueOf(etClave.getText().toString()));
 
                 //Variable a la que se le asigna el valor entero del id de conexión del usuario y que recibimos del Servidor al establecer conexión
                 resposta_id = in.readInt();
@@ -134,7 +136,11 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             } catch (IOException e) {
+                Toast.makeText(getApplicationContext(), "ERRROOOO", Toast.LENGTH_LONG).show();
+                Log.i(TAG,"ERROR......");
                 e.printStackTrace();
+
+
             }
 
             return strings[0];
